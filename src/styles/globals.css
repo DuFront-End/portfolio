@@ -1,0 +1,236 @@
+/* src/styles/globals.css */
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+
+@theme {
+    /* Music Tech Color Palette - Màu sắc trầm ấm phong cách âm nhạc */
+    --color-music-dark: #1a1a2e;
+    --color-music-blue: #16213e;
+    --color-music-purple: #0f3460;
+    --color-music-red: #e94560;
+    --color-music-gold: #ffd700;
+    --color-music-cream: #f5f5dc;
+
+    /* Tech Colors - Màu công nghệ tinh tế */
+    --color-tech-blue: #2563eb;
+    --color-tech-cyan: #06b6d4;
+    --color-tech-gray: #1f2937;
+    --color-tech-light: #f8fafc;
+
+    /* Fonts */
+    --font-sans: "Inter", system-ui, sans-serif;
+    --font-heading: "Poppins", "Inter", system-ui, sans-serif;
+    --font-music: "Playfair Display", serif;
+    --font-tech: "JetBrains Mono", monospace;
+}
+
+@layer base {
+    html {
+        font-family: var(--font-sans);
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        background-color: var(--color-music-dark);
+    }
+
+    body {
+        @apply bg-music-dark text-music-cream;
+        overflow-x: hidden;
+    }
+
+    ::selection {
+        @apply bg-music-red/20 text-music-cream;
+    }
+
+    /* Custom scrollbar Music style */
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        @apply bg-music-blue;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        @apply bg-music-purple border border-music-red/30;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        @apply bg-music-red/40;
+    }
+}
+
+@layer components {
+
+    /* Music Card với hiệu ứng vinyl */
+    .music-card {
+        @apply bg-music-blue/50 backdrop-blur-sm border border-music-purple/50 rounded-2xl transition-all duration-300 hover:border-music-red/30;
+    }
+
+    .music-nav {
+        @apply bg-music-dark/95 backdrop-blur-md border-b border-music-purple/30;
+    }
+
+    /* Vinyl Record Effect */
+    .vinyl-effect {
+        background: radial-gradient(circle at center,
+                transparent 40%,
+                var(--color-music-blue) 41%,
+                var(--color-music-blue) 45%,
+                transparent 46%,
+                transparent 54%,
+                var(--color-music-purple) 55%,
+                var(--color-music-purple) 60%,
+                transparent 61%);
+        animation: spin-vinyl 20s linear infinite;
+    }
+
+    @keyframes spin-vinyl {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Realistic Vinyl Record Groove Rings */
+    .vinyl-rings {
+        background: repeating-radial-gradient(
+            circle at center,
+            #2a2a2a,
+            #181818 2px,
+            #0d0d0d 4px,
+            #2a2a2a 5px
+        );
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    }
+
+    /* Vinyl Glare/Shine Effect */
+    .vinyl-shine {
+        background: conic-gradient(
+            from 0deg,
+            transparent 0deg,
+            transparent 35deg,
+            rgba(255, 255, 255, 0.12) 90deg,
+            transparent 145deg,
+            transparent 180deg,
+            transparent 215deg,
+            rgba(255, 255, 255, 0.12) 270deg,
+            transparent 325deg,
+            transparent 360deg
+        );
+    }
+
+    /* Music Wave Lines */
+    .music-wave {
+        background: repeating-linear-gradient(90deg,
+                transparent,
+                transparent 20px,
+                var(--color-music-red) 20px,
+                var(--color-music-red) 22px);
+        animation: wave-move 2s linear infinite;
+    }
+
+    @keyframes wave-move {
+        from {
+            background-position-x: 0;
+        }
+
+        to {
+            background-position-x: 44px;
+        }
+    }
+
+    @keyframes ping-slow {
+        0% { transform: scale(1); opacity: 0.8; }
+        100% { transform: scale(2); opacity: 0; }
+    }
+
+    .animate-ping-slow {
+        animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    /* Section Styles */
+    .section-container {
+        @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 relative;
+    }
+
+    .section-title {
+        @apply font-music text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-center text-music-cream;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .section-subtitle {
+        @apply font-tech text-lg text-music-cream/70 max-w-2xl mx-auto text-center mb-8;
+    }
+
+    /* Button Styles - Music inspired */
+    .btn-primary {
+        @apply px-8 py-3 rounded-lg bg-music-red text-music-cream font-medium hover:bg-music-red/80 active:scale-95 transition-all duration-200 border border-music-red/50;
+    }
+
+    .btn-secondary {
+        @apply px-8 py-3 rounded-lg border border-music-gold text-music-gold font-medium hover:bg-music-gold/10 transition-all duration-200;
+    }
+
+    .btn-tech {
+        @apply px-6 py-2 rounded-lg border border-tech-blue text-tech-blue font-medium hover:bg-tech-blue/10 transition-all duration-200;
+    }
+
+    /* Tech Icon với hiệu ứng âm nhạc */
+    .tech-icon {
+        @apply w-12 h-12 rounded-lg bg-music-purple/30 border border-music-purple/50 flex items-center justify-center hover:border-music-red/50 transition-all duration-300;
+    }
+
+    /* Music Note Animation */
+    .music-note {
+        animation: note-float 3s ease-in-out infinite;
+    }
+
+    @keyframes note-float {
+
+        0%,
+        100% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+        }
+
+        50% {
+            transform: translateY(-20px) rotate(10deg);
+            opacity: 0.8;
+        }
+    }
+
+    /* Piano Key Effect */
+    .piano-key {
+        @apply relative overflow-hidden;
+    }
+
+    .piano-key::before {
+        content: '';
+        @apply absolute inset-0 bg-gradient-to-b from-white/5 to-transparent;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+    }
+
+    .piano-key:hover::before {
+        transform: translateY(0);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 640px) {
+        .section-container {
+            @apply py-10 px-4;
+        }
+
+        .section-title {
+            @apply text-3xl mb-6;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            @apply px-6 py-2.5 text-sm;
+        }
+    }
+}
