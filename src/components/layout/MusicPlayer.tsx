@@ -27,7 +27,8 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
   useEffect(() => {
     const fetchPlaylist = async () => {
       try {
-        const res = await fetch(`/api/playlist`);
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const res = await fetch(`${apiUrl}/api/playlist`);
         const data = await res.json();
         if (data.success) {
           const formattedPlaylist = data.data.map((item: any, index: number) => ({

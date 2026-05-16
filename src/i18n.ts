@@ -69,7 +69,8 @@ const fallbackLanguages: LanguageInfo[] = [
 
 export const fetchAvailableLanguages = async (): Promise<LanguageInfo[]> => {
   try {
-    const res = await fetch(`/api/translations`);
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const res = await fetch(`${apiUrl}/api/translations`);
     const data = await res.json();
 
     if (data.success && data.data.length > 0) {

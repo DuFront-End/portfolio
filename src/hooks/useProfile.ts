@@ -20,7 +20,8 @@ export const useProfile = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch(`/api/profile?t=${Date.now()}`)
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    fetch(`${apiUrl}/api/profile?t=${Date.now()}`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {
