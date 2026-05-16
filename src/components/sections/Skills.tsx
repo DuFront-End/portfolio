@@ -32,7 +32,8 @@ const Skills = ({ activeSection }: { activeSection?: string }) => {
 
     useSmartPolling(async () => {
         try {
-            const res = await fetch('/api/skills');
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const res = await fetch(`${apiUrl}/api/skills`);
             if (res.status === 429) return res;
 
             const data = await res.json();
