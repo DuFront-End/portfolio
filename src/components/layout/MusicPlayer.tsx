@@ -118,7 +118,6 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
 
         audioRef.current.volume = 1;
         audioRef.current.muted = false;
-        audioRef.current.load();
         audioRef.current.play()
           .then(() => setIsMusicPlaying(true))
           .catch(err => console.error("🎵 Playback failed:", err));
