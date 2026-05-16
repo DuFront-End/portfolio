@@ -131,18 +131,19 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
     if (!track) return '';
     
     let url = track.url;
-    // Strip '/public' prefix if it exists, as Vite serves public folder at root
-    if (url.startsWith('/public/')) {
-      url = url.replace('/public/', '/');
-    } else if (url.startsWith('public/')) {
-      url = url.replace('public/', '/');
+    // If the URL is already an absolute HTTP URL (like Cloudinary), use it directly.
+    if (url.startsWith('http')) {
+      return `${url}?v=${track.id}`;
     }
 
-    const finalUrl = url.startsWith('http') 
-      ? url 
-      : (url.startsWith('/') ? url : `/${url}`);
-      
-    return `${encodeURI(finalUrl)}?v=${track.id}`;
+    // Otherwise, it's a relative path hosted on the backend.
+    // Strip '/public' prefix if it exists, as the backend serves it directly under /public
+    // Wait, the backend uses `app.use('/public', express.static(...))`, so `/public/uploads/...` is correct for the backend.
+    // Let's just make sure it has a leading slash and prepend the backend URL.
+    const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+    const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+    
+    return `${apiUrl}${encodeURI(cleanUrl)}?v=${track.id}`;
   }, [playlist, currentTrackIndex]);
 
   return (
