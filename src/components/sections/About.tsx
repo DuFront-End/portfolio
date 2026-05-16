@@ -15,6 +15,13 @@ const About = ({ activeSection }: { activeSection?: string }) => {
     const { profile } = useProfile()
     const isActive = activeSection === 'about'
 
+    const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+    const avatarUrl = profile?.avatar 
+        ? (profile.avatar.startsWith('http') 
+            ? profile.avatar 
+            : `${apiUrl}${profile.avatar.startsWith('/') ? '' : '/'}${profile.avatar}`)
+        : '/Du.jpg';
+
     return (
         <section id="about" className="section-container relative">
             <SectionFocusWrapper isActive={isActive}>
@@ -58,13 +65,7 @@ const About = ({ activeSection }: { activeSection?: string }) => {
                                         className="relative w-44 h-44 rounded-full overflow-hidden bg-music-dark border-4 border-music-red/30 mx-auto mb-2"
                                     >
                                         <img
-                                            src={profile?.avatar 
-                                                ? (profile.avatar.startsWith('http') 
-                                                    ? profile.avatar 
-                                                    : (profile.avatar.startsWith('/public/') 
-                                                        ? profile.avatar.replace('/public/', '/') 
-                                                        : profile.avatar)) 
-                                                : '/Du.jpg'}
+                                            src={avatarUrl}
                                             alt="Avatar"
                                             className="w-full h-full object-cover object-top"
                                             loading="lazy"

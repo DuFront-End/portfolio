@@ -17,6 +17,13 @@ const Hero = () => {
     const { t } = useTranslation()
     const { profile } = useProfile()
 
+    const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+    const cvHref = profile?.cvUrl 
+        ? (profile.cvUrl.startsWith('http') 
+            ? profile.cvUrl 
+            : `${apiUrl}${profile.cvUrl.startsWith('/') ? '' : '/'}${profile.cvUrl}`)
+        : '/cv.pdf';
+
     return (
         <section
             id="home"
@@ -228,14 +235,9 @@ const Hero = () => {
                         </motion.a>
 
                         <motion.a
-                            href={profile?.cvUrl?.startsWith('http') 
-                                ? profile.cvUrl 
-                                : profile?.cvUrl 
-                                    ? profile.cvUrl 
-                                    : "/cv.pdf"
-                            }
-                            download={profile?.cvUrl?.startsWith('http') ? undefined : "Nguyen-Khanh-Du-CV.pdf"}
-                            target={profile?.cvUrl?.startsWith('http') ? "_blank" : undefined}
+                            href={cvHref}
+                            download={cvHref === '/cv.pdf' ? "Nguyen-Khanh-Du-CV.pdf" : undefined}
+                            target={cvHref.startsWith('http') ? "_blank" : undefined}
                             whileHover={{
                                 scale: 1.05,
                                 boxShadow:
