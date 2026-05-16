@@ -151,6 +151,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
       <audio
         ref={audioRef}
         src={currentAudioUrl}
+        crossOrigin="anonymous"
         onEnded={() => nextTrack()}
         preload="auto"
       />
