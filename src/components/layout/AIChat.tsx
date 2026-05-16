@@ -38,7 +38,8 @@ const AIChat: React.FC = () => {
 
     try {
       const history = messages.slice(-6).map(m => ({ role: m.role, text: m.text }));
-      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/ai/chat`, {
+      const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+      const response = await axios.post(`${apiUrl}/api/ai/chat`, {
         message: userMsg,
         history
       });

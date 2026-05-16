@@ -70,7 +70,7 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
 
     useSmartPolling(async () => {
         try {
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
             const res = await fetch(`${apiUrl}/api/achievements`);
             if (res.status === 429) return res;
 
