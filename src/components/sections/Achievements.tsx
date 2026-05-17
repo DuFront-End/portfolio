@@ -385,18 +385,15 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                                     whileTap={{ scale: 0.98 }}
                                                     className="flex flex-col w-full rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden group/link cursor-pointer transition-all hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] shrink-0"
                                                 >
-                                                    <div className="w-full h-24 md:h-28 relative bg-black flex items-center justify-center overflow-hidden select-none border-b border-slate-800">
-                                                        {activeAchievement.image ? (
-                                                            <img 
-                                                                src={activeAchievement.image} 
-                                                                alt="Link Preview"
-                                                                className="w-full h-full object-cover opacity-80 group-hover/link:opacity-100 group-hover/link:scale-105 transition-all duration-500"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full flex items-center justify-center text-slate-700 bg-slate-950">
-                                                                <FaExternalLinkAlt className="w-6 h-6 opacity-50" />
-                                                            </div>
-                                                        )}
+                                                    <div className="w-full h-24 md:h-28 relative bg-slate-950 flex items-center justify-center overflow-hidden select-none border-b border-slate-800">
+                                                        {/* Abstract background gradient */}
+                                                        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/80 to-slate-950 opacity-80 group-hover/link:opacity-100 transition-opacity"></div>
+                                                        <div className="absolute inset-0 opacity-20 group-hover/link:opacity-40 transition-opacity duration-500" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)', backgroundSize: '16px 16px' }}></div>
+                                                        
+                                                        {/* Link Icon */}
+                                                        <div className="relative z-0 flex items-center justify-center w-full h-full">
+                                                            <FaExternalLinkAlt className="w-8 h-8 text-slate-700/80 group-hover/link:text-cyan-500/60 group-hover/link:scale-110 transition-all duration-500" />
+                                                        </div>
 
                                                         <div className="absolute bottom-2 left-2 w-7 h-7 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center p-1 shadow-lg z-10">
                                                             <img 
