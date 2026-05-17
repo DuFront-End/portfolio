@@ -235,7 +235,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
             </AnimatePresence>
 
             {/* Genre Selector */}
-            <div className="relative">
+            <div className="relative group/genre">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -252,6 +252,10 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
               >
                 <FaListUl className="text-xs" />
               </motion.button>
+
+              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover/genre:opacity-100 transition-opacity pointer-events-none whitespace-nowrap bg-slate-900/90 text-music-gold text-[10px] px-2 py-1 rounded-md border border-music-gold/30 shadow-lg z-[130]">
+                Thể loại
+              </div>
 
               <AnimatePresence>
                 {isGenreDropdownOpen && (
@@ -290,7 +294,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
             </div>
 
             {/* Playlist Viewer Selector */}
-            <div className="relative">
+            <div className="relative group/playlist">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -307,6 +311,10 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
               >
                 <FaMusic className="text-xs" />
               </motion.button>
+
+              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover/playlist:opacity-100 transition-opacity pointer-events-none whitespace-nowrap bg-slate-900/90 text-music-gold text-[10px] px-2 py-1 rounded-md border border-music-gold/30 shadow-lg z-[130]">
+                Bài hát
+              </div>
 
               <AnimatePresence>
                 {isPlaylistDropdownOpen && (
