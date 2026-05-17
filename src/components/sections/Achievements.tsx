@@ -19,6 +19,7 @@ interface AchievementAPI {
     icon: string
     image?: string
     images?: string[]
+    imageDescriptions?: string[]
     articleUrl?: string
     color: string
     bgColor: string
@@ -233,28 +234,28 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
             <AnimatePresence>
                 {activeAchievement && (
                     <motion.div
-                        className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-md pointer-events-auto"
+                        className="fixed inset-0 z-[200] flex items-center justify-center sm:p-6 bg-black/95 backdrop-blur-xl pointer-events-auto"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setActiveAchievement(null)}
                     >
                         <motion.div
-                            initial={{ scale: 0.92, opacity: 0, y: 30 }}
+                            initial={{ scale: 0.95, opacity: 0, y: 20 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.92, opacity: 0, y: 30 }}
+                            exit={{ scale: 0.95, opacity: 0, y: 20 }}
                             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-                            className="relative max-w-5xl w-full max-h-[90vh] md:max-h-[80vh] bg-music-dark/95 border border-white/10 rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-[0_0_80px_rgba(0,0,0,0.7)] pointer-events-auto"
+                            className="relative max-w-5xl w-full h-[100dvh] md:h-auto md:max-h-[85vh] bg-[#05080f] md:border border-white/10 rounded-none md:rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-[0_0_80px_rgba(0,0,0,0.7)] pointer-events-auto"
                             onClick={(e) => e.stopPropagation()} 
                         >
                             <button 
                                 onClick={() => setActiveAchievement(null)}
-                                className="absolute top-4 right-4 z-[250] p-2 rounded-xl bg-white/5 hover:bg-music-red/80 border border-white/5 hover:border-white/10 text-white transition-all active:scale-95 cursor-pointer shadow-md"
+                                className="absolute top-4 right-4 z-[250] p-2.5 md:p-2 rounded-full md:rounded-xl bg-slate-800 md:bg-white/5 hover:bg-rose-600 border border-slate-700 md:border-white/5 text-white transition-all active:scale-95 cursor-pointer shadow-xl"
                                 title="Đóng cửa sổ"
                             >
-                                <FaTimes className="w-4 h-4 sm:w-4 sm:h-4" />
+                                <FaTimes className="w-5 h-5 sm:w-4 sm:h-4" />
                             </button>
-                            <div className="relative flex-1 aspect-[4/3] md:aspect-auto md:h-full bg-black/30 flex items-center justify-center group/gallery overflow-hidden select-none border-b md:border-b-0 md:border-r border-white/5">
+                            <div className="relative flex-1 h-[55dvh] md:h-full bg-black flex items-center justify-center group/gallery overflow-hidden select-none border-b md:border-b-0 md:border-r border-white/5">
                                 
                                 {(() => {
                                     const album = [
@@ -267,6 +268,10 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                     );
 
                                     const curImg = album[activePhotoIndex % album.length] || album[0];
+                                    const hasMainImage = !!activeAchievement.image;
+                                    const currentDesc = hasMainImage 
+                                        ? (activePhotoIndex === 0 ? '' : (activeAchievement.imageDescriptions?.[activePhotoIndex - 1] || ''))
+                                        : (activeAchievement.imageDescriptions?.[activePhotoIndex] || '');
 
                                     return (
                                         <>
@@ -275,7 +280,7 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                                 src={curImg} 
                                                 alt={activeAchievement.title}
                                                 className={clsx(
-                                                    "max-w-full max-h-[55vh] md:max-h-[70vh] w-auto h-auto object-contain p-3 sm:p-5 drop-shadow-2xl select-none touch-none",
+                                                    "w-full h-full object-contain drop-shadow-2xl select-none touch-none",
                                                     album.length > 1 ? "cursor-grab active:cursor-grabbing" : ""
                                                 )}
                                                 initial={{ opacity: 0, scale: 0.95 }}
@@ -294,6 +299,16 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                                     }
                                                 }}
                                             />
+
+                                            {currentDesc && (
+                                                <div className="absolute bottom-10 md:bottom-12 left-0 w-full px-4 flex justify-center pointer-events-none z-30">
+                                                    <div className="bg-black/80 backdrop-blur-md border border-white/10 px-4 py-2 rounded-xl text-center max-w-[90%] shadow-2xl">
+                                                        <p className="text-sm md:text-base text-music-cream font-medium shadow-black drop-shadow-md">
+                                                            {currentDesc}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
 
                                             {album.length > 1 && (
                                                 <>
@@ -333,7 +348,7 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                 })()}
                             </div>
 
-                            <div className="w-full md:w-[350px] bg-[#0f121a]/95 p-5 sm:p-7 flex flex-col justify-between shrink-0 h-fit md:h-auto overflow-y-auto">
+                            <div className="w-full md:w-[380px] bg-[#0a0e17] p-5 sm:p-7 flex flex-col justify-between shrink-0 h-[45dvh] md:h-auto overflow-y-auto custom-main-scrollbar">
                                 <div className="space-y-3.5">
                                     <span className={clsx("inline-block text-[9px] font-mono tracking-widest uppercase py-1 px-2.5 border rounded-lg bg-white/5", activeAchievement.color, activeAchievement.borderColor)}>
                                         {activeAchievement.period}
@@ -353,24 +368,24 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                         href={activeAchievement.articleUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        whileHover={{ scale: 1.01, backgroundColor: 'rgba(255, 255, 255, 0.03)' }}
+                                        whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
-                                        className="mt-6 flex w-full rounded-xl bg-black/30 border border-white/5 overflow-hidden group/link cursor-pointer transition-colors hover:border-music-gold/20 shadow-md"
+                                        className="mt-6 flex flex-col w-full rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden group/link cursor-pointer transition-all hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] block"
                                     >
-                                        <div className="w-16 sm:w-20 relative border-r border-white/5 shrink-0 bg-black/60 flex items-center justify-center overflow-hidden select-none transition-opacity">
+                                        <div className="w-full h-32 md:h-40 relative bg-black flex items-center justify-center overflow-hidden select-none border-b border-slate-800">
                                             {activeAchievement.image ? (
                                                 <img 
                                                     src={activeAchievement.image} 
                                                     alt="Link Preview"
-                                                    className="w-full h-full object-cover opacity-70 group-hover/link:opacity-100 group-hover/link:scale-105 transition-all duration-500"
+                                                    className="w-full h-full object-cover opacity-80 group-hover/link:opacity-100 group-hover/link:scale-105 transition-all duration-500"
                                                 />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-music-cream/20 bg-white/5">
-                                                    <FaExternalLinkAlt className="w-3.5 h-3.5" />
+                                                <div className="w-full h-full flex items-center justify-center text-slate-700 bg-slate-950">
+                                                    <FaExternalLinkAlt className="w-8 h-8 opacity-50" />
                                                 </div>
                                             )}
 
-                                            <div className="absolute bottom-1 right-1 w-4.5 h-4.5 sm:w-5.5 sm:h-5.5 rounded-full bg-black/80 border border-white/10 flex items-center justify-center p-0.5 backdrop-blur-sm shadow-lg z-10">
+                                            <div className="absolute bottom-3 left-3 w-8 h-8 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center p-1 shadow-lg z-10">
                                                 <img 
                                                     src={`https://www.google.com/s2/favicons?sz=64&domain=${(() => {
                                                         try { return new URL(activeAchievement.articleUrl || '').hostname; }
@@ -383,22 +398,19 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                             </div>
                                         </div>
 
-                                        <div className="flex-1 p-3 flex flex-col justify-center overflow-hidden text-left">
-                                            <div className="flex items-center gap-1.5 text-[9px] font-mono text-music-gold/70 tracking-widest uppercase mb-0.5 font-bold truncate">
-                                                <span>🌐</span>
+                                        <div className="p-4 flex flex-col justify-center text-left bg-slate-900">
+                                            <div className="text-sm md:text-base font-bold text-slate-200 group-hover/link:text-cyan-400 transition-colors line-clamp-2 leading-snug mb-1">
+                                                <AutoTranslate text="Đọc bài viết báo chí / Tài liệu chi tiết" />
+                                            </div>
+                                            <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-slate-500 truncate">
+                                                <FaExternalLinkAlt className="w-2.5 h-2.5" />
                                                 <span>{(() => {
                                                     try {
                                                         return new URL(activeAchievement.articleUrl || '').hostname.replace('www.', '');
                                                     } catch {
-                                                        return 'LIÊN KẾT DỰ ÁN';
+                                                        return 'Liên kết bên ngoài';
                                                     }
                                                 })()}</span>
-                                            </div>
-                                            <div className="text-xs font-extrabold text-music-cream group-hover/link:text-music-gold transition-colors line-clamp-1 font-sans">
-                                                <AutoTranslate text="Đọc bài viết báo chí / Tài liệu" />
-                                            </div>
-                                            <div className="text-[9px] text-music-cream/30 truncate mt-0.5 select-none font-sans">
-                                                {activeAchievement.articleUrl}
                                             </div>
                                         </div>
                                     </motion.a>
