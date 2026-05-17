@@ -92,73 +92,75 @@ const MusicWaveEffect = ({ isPlaying, scrollY, activeSection }: MusicWaveEffectP
             }
             const currentColors = getSectionColors(activeSectionRef.current);
 
-            // 1. Particle creation (Burst on bass)
+            // 1 & 2. Particle creation and rendering (Disabled on mobile to reduce clutter)
             const isMobile = canvas.width < 768;
-            const particleChance = playing 
-                ? (isMobile ? 0.1 + bass * 1.0 + treble * 0.5 : 0.2 + bass * 1.5 + treble) 
-                : (isMobile ? 0.05 : 0.1);
-            if (Math.random() < particleChance) {
-                const color = currentColors[Math.floor(Math.random() * currentColors.length)];
-                particlesRef.current.push({
-                    x: Math.random() * canvas.width,
-                    y: canvas.height + 10,
-                    size: Math.random() * 3.5 + 1.5,
-                    speedX: Math.random() * 2 - 1,
-                    speedY: isMobile ? (Math.random() * -2.5 - 1) : (Math.random() * -4 - 1.5), 
-                    color,
-                    life: 1,
-                    maxLife: Math.random() * 120 + 180 
-                })
-            }
-
-            // 2. Update particles & Draw
-            const particles = particlesRef.current;
-            const speedMultiplier = playing 
-                ? (isMobile ? 1.0 + bass * 2.5 : 1.5 + bass * 5) 
-                : (isMobile ? 0.8 : 1.1);
-            const connectionDist = playing 
-                ? (isMobile ? 60 + intensity * 60 : 110 + intensity * 120) 
-                : (isMobile ? 40 : 80);
-            const connectionDistSq = connectionDist * connectionDist;
-
-            particlesRef.current = particles.filter(p => {
-                p.x += (p.speedX + Math.sin(Date.now() / 2000 + p.x) * 0.3) * speedMultiplier;
-                p.y += (p.speedY - bass * 8 - treble * 2) * speedMultiplier; 
-                p.life -= 0.004;
-                return p.life > 0 && p.y > -20;
-            });
-
-            const activeParticles = particlesRef.current;
-            const len = activeParticles.length;
             
-            for (let i = 0; i < len; i++) {
-                const p1 = activeParticles[i];
-                const alpha = playing ? (0.7 + intensity * 0.3) * p1.life : 0.4 * p1.life;
+            if (!isMobile) {
+                const particleChance = playing ? (0.2 + bass * 1.5 + treble) : 0.1;
                 
-                ctx.shadowBlur = playing ? (10 + bass * 40) : 0;
-                ctx.shadowColor = `rgba(${p1.color}, 0.9)`;
-                ctx.fillStyle = `rgba(${p1.color}, ${alpha})`;
-                ctx.beginPath();
-                const dynamicSize = playing ? p1.size * (1 + bass * 2 + treble * 2) : p1.size;
-                ctx.arc(p1.x, p1.y, dynamicSize, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
+                if (Math.random() < particleChance) {
+                    const color = currentColors[Math.floor(Math.random() * currentColors.length)];
+                    particlesRef.current.push({
+                        x: Math.random() * canvas.width,
+                        y: canvas.height + 10,
+                        size: Math.random() * 3.5 + 1.5,
+                        speedX: Math.random() * 2 - 1,
+                        speedY: (Math.random() * -4 - 1.5), 
+                        color,
+                        life: 1,
+                        maxLife: Math.random() * 120 + 180 
+                    });
+                }
 
-                for (let j = i + 1; j < len; j++) {
-                    const p2 = activeParticles[j];
-                    const dx = p1.x - p2.x;
-                    const dy = p1.y - p2.y;
-                    const distSq = dx * dx + dy * dy;
+                const particles = particlesRef.current;
+                const speedMultiplier = playing ? (1.5 + bass * 5) : 1.1;
+                const connectionDist = playing ? (110 + intensity * 120) : 80;
+                const connectionDistSq = connectionDist * connectionDist;
 
-                    if (distSq < connectionDistSq) {
-                        const connAlpha = (1 - Math.sqrt(distSq) / connectionDist) * (playing ? 0.3 + intensity * 0.7 : 0.15) * p1.life;
-                        ctx.strokeStyle = `rgba(${p1.color}, ${connAlpha})`;
-                        ctx.lineWidth = playing ? (0.5 + intensity * 2) : 0.3;
-                        ctx.beginPath();
-                        ctx.moveTo(p1.x, p1.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.stroke();
+                particlesRef.current = particles.filter(p => {
+                    p.x += (p.speedX + Math.sin(Date.now() / 2000 + p.x) * 0.3) * speedMultiplier;
+                    p.y += (p.speedY - bass * 8 - treble * 2) * speedMultiplier; 
+                    p.life -= 0.004;
+                    return p.life > 0 && p.y > -20;
+                });
+
+                const activeParticles = particlesRef.current;
+                const len = activeParticles.length;
+                
+                for (let i = 0; i < len; i++) {
+                    const p1 = activeParticles[i];
+                    const alpha = playing ? (0.7 + intensity * 0.3) * p1.life : 0.4 * p1.life;
+                    
+                    ctx.shadowBlur = playing ? (10 + bass * 40) : 0;
+                    ctx.shadowColor = `rgba(${p1.color}, 0.9)`;
+                    ctx.fillStyle = `rgba(${p1.color}, ${alpha})`;
+                    ctx.beginPath();
+                    const dynamicSize = playing ? p1.size * (1 + bass * 2 + treble * 2) : p1.size;
+                    ctx.arc(p1.x, p1.y, dynamicSize, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    for (let j = i + 1; j < len; j++) {
+                        const p2 = activeParticles[j];
+                        const dx = p1.x - p2.x;
+                        const dy = p1.y - p2.y;
+                        const distSq = dx * dx + dy * dy;
+
+                        if (distSq < connectionDistSq) {
+                            const connAlpha = (1 - Math.sqrt(distSq) / connectionDist) * (playing ? 0.3 + intensity * 0.7 : 0.15) * p1.life;
+                            ctx.strokeStyle = `rgba(${p1.color}, ${connAlpha})`;
+                            ctx.lineWidth = playing ? (0.5 + intensity * 2) : 0.3;
+                            ctx.beginPath();
+                            ctx.moveTo(p1.x, p1.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.stroke();
+                        }
                     }
+                }
+            } else {
+                // Clear particles array on mobile so we don't leak memory if toggling device sizes
+                if (particlesRef.current.length > 0) {
+                    particlesRef.current = [];
                 }
             }
 
