@@ -18,7 +18,29 @@ const AIChat: React.FC = () => {
     { role: 'ai', text: 'Xin chào! Tôi là trợ lý AI của Khanh Du. Tôi có thể giúp bạn khám phá các dự án hoặc chọn nhạc phù hợp. Bạn cần giúp gì không? ✨', timestamp: new Date() }
   ]);
   const [loading, setLoading] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY < 50) {
+        setIsVisible(true);
+        lastScrollY.current = currentScrollY;
+        return;
+      }
+      if (currentScrollY > lastScrollY.current + 15) {
+        setIsVisible(false);
+        lastScrollY.current = currentScrollY;
+      } else if (currentScrollY < lastScrollY.current - 15) {
+        setIsVisible(true);
+        lastScrollY.current = currentScrollY;
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -92,27 +114,39 @@ const AIChat: React.FC = () => {
       </motion.div>
 
       {/* Floating Trigger Button */}
-      <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsOpen(true)}
+      <motion.div
         animate={{ 
-          boxShadow: [
-            "0 0 5px rgba(6, 182, 212, 0.2)", 
-            "0 0 25px rgba(6, 182, 212, 0.5)", 
-            "0 0 5px rgba(6, 182, 212, 0.2)"
-          ] 
+          y: isVisible || isOpen ? 0 : 150,
+          opacity: isVisible || isOpen ? 1 : 0 
         }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        className="fixed bottom-4 left-4 sm:bottom-8 sm:left-8 z-[100] p-2 sm:p-3 rounded-full sm:rounded-2xl bg-[#0a192f]/90 backdrop-blur-xl border-2 border-cyan-500/40 hover:border-cyan-400 shadow-2xl group transition-all duration-300 flex items-center justify-center"
+        transition={{ duration: 0.3 }}
+        className="fixed bottom-4 left-4 sm:bottom-8 sm:left-8 z-[100]"
       >
-        <div className="relative flex items-center justify-center">
-          <div className="w-12 h-12 rounded-full sm:rounded-xl bg-gradient-to-br from-cyan-500/30 to-blue-600/30 flex items-center justify-center border border-white/20 group-hover:border-cyan-400/50 transition-colors shadow-[inset_0_0_15px_rgba(6,182,212,0.3)]">
-            <Bot className="w-7 h-7 text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] group-hover:scale-110 transition-transform" />
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsOpen(true)}
+          animate={{ 
+            boxShadow: [
+              "0 0 5px rgba(6, 182, 212, 0.2)", 
+              "0 0 20px rgba(6, 182, 212, 0.4)", 
+              "0 0 5px rgba(6, 182, 212, 0.2)"
+            ] 
+          }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="p-1.5 sm:p-3 rounded-full sm:rounded-2xl bg-[#0a192f]/90 backdrop-blur-xl border-2 border-cyan-500/40 hover:border-cyan-400 shadow-2xl group transition-all duration-300 flex items-center gap-2 sm:gap-0 pr-4 sm:pr-3"
+        >
+          <div className="relative flex items-center justify-center">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full sm:rounded-xl bg-gradient-to-br from-cyan-500/30 to-blue-600/30 flex items-center justify-center border border-white/20 group-hover:border-cyan-400/50 transition-colors shadow-[inset_0_0_15px_rgba(6,182,212,0.3)]">
+              <Bot className="w-5 h-5 sm:w-7 sm:h-7 text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] group-hover:scale-110 transition-transform" />
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-emerald-400 rounded-full border-2 border-[#0a192f] shadow-[0_0_15px_#34d399]" />
           </div>
-          <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-emerald-400 rounded-full border-2 border-[#0a192f] shadow-[0_0_15px_#34d399]" />
-        </div>
-      </motion.button>
+          <span className="sm:hidden text-[11px] font-bold text-cyan-300 uppercase tracking-widest whitespace-nowrap">
+            Hỏi AI
+          </span>
+        </motion.button>
+      </motion.div>
 
       {/* Chat Window */}
       <AnimatePresence>

@@ -93,7 +93,10 @@ const MusicWaveEffect = ({ isPlaying, scrollY, activeSection }: MusicWaveEffectP
             const currentColors = getSectionColors(activeSectionRef.current);
 
             // 1. Particle creation (Burst on bass)
-            const particleChance = playing ? (0.2 + bass * 1.5 + treble) : 0.1;
+            const isMobile = canvas.width < 768;
+            const particleChance = playing 
+                ? (isMobile ? 0.1 + bass * 1.0 + treble * 0.5 : 0.2 + bass * 1.5 + treble) 
+                : (isMobile ? 0.05 : 0.1);
             if (Math.random() < particleChance) {
                 const color = currentColors[Math.floor(Math.random() * currentColors.length)];
                 particlesRef.current.push({
@@ -101,7 +104,7 @@ const MusicWaveEffect = ({ isPlaying, scrollY, activeSection }: MusicWaveEffectP
                     y: canvas.height + 10,
                     size: Math.random() * 3.5 + 1.5,
                     speedX: Math.random() * 2 - 1,
-                    speedY: Math.random() * -4 - 1.5, 
+                    speedY: isMobile ? (Math.random() * -2.5 - 1) : (Math.random() * -4 - 1.5), 
                     color,
                     life: 1,
                     maxLife: Math.random() * 120 + 180 
@@ -110,8 +113,9 @@ const MusicWaveEffect = ({ isPlaying, scrollY, activeSection }: MusicWaveEffectP
 
             // 2. Update particles & Draw
             const particles = particlesRef.current;
-            const speedMultiplier = playing ? (1.5 + bass * 5) : 1.1; 
-            const isMobile = canvas.width < 768;
+            const speedMultiplier = playing 
+                ? (isMobile ? 1.0 + bass * 2.5 : 1.5 + bass * 5) 
+                : (isMobile ? 0.8 : 1.1);
             const connectionDist = playing 
                 ? (isMobile ? 60 + intensity * 60 : 110 + intensity * 120) 
                 : (isMobile ? 40 : 80);
@@ -161,9 +165,8 @@ const MusicWaveEffect = ({ isPlaying, scrollY, activeSection }: MusicWaveEffectP
             // 3. Ultra Aggressive Multi-Wave effect
             if (playing) {
                 const time = Date.now() / 1000
-                const isMobile = canvas.width < 768;
                 const baseAmplitude = isMobile 
-                    ? (15 + intensity * 100) 
+                    ? (35 + intensity * 180) 
                     : (40 + intensity * 350); 
                 
                 const waveColors = currentColors.map(c => `rgba(${c}, ${0.4 + intensity})`);
