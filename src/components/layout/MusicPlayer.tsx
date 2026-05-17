@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaPlay, FaPause, FaStepForward, FaListUl } from 'react-icons/fa'
+import { FaPlay, FaPause, FaStepForward, FaListUl, FaMusic } from 'react-icons/fa'
 import { useTranslation } from 'react-i18next'
 import AutoTranslate from '../common/AutoTranslate'
 
@@ -20,6 +20,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
   const [playlist, setPlaylist] = useState(FALLBACK_PLAYLIST)
   const [selectedGenre, setSelectedGenre] = useState<string>('All')
   const [isGenreDropdownOpen, setIsGenreDropdownOpen] = useState(false)
+  const [isPlaylistDropdownOpen, setIsPlaylistDropdownOpen] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const genres = useMemo(() => {
@@ -241,6 +242,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsGenreDropdownOpen(!isGenreDropdownOpen);
+                  setIsPlaylistDropdownOpen(false);
                 }}
                 className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-all backdrop-blur-sm ${
                   isGenreDropdownOpen 
@@ -281,6 +283,84 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
                           {selectedGenre === genre && <FaPlay className="text-[8px]" />}
                         </button>
                       ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Playlist Viewer Selector */}
+            <div className="relative">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsPlaylistDropdownOpen(!isPlaylistDropdownOpen);
+                  setIsGenreDropdownOpen(false);
+                }}
+                className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-all backdrop-blur-sm ${
+                  isPlaylistDropdownOpen 
+                    ? 'bg-music-red/20 border-music-red text-music-red' 
+                    : 'bg-music-blue/40 border-music-gold/20 text-music-gold hover:border-music-red hover:text-music-red'
+                }`}
+              >
+                <FaMusic className="text-xs" />
+              </motion.button>
+
+              <AnimatePresence>
+                {isPlaylistDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                    className="absolute bottom-full right-0 mb-3 w-64 bg-slate-900/95 backdrop-blur-xl border border-music-gold/30 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.8)] overflow-hidden z-[120]"
+                  >
+                    <div className="p-3 border-b border-music-gold/10 flex items-center justify-between">
+                      <span className="text-[10px] font-tech text-music-gold tracking-widest uppercase">Danh sách phát</span>
+                      <span className="text-[10px] text-slate-400 font-bold">{playlist.length} bài</span>
+                    </div>
+                    <div className="max-h-64 overflow-y-auto custom-scrollbar p-1.5 space-y-1">
+                      {playlist.map((track, idx) => {
+                        const isThisPlaying = currentTrackIndex === idx;
+                        return (
+                          <button
+                            key={track.id || idx}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCurrentTrackIndex(idx);
+                              if (!isMusicPlaying) {
+                                toggleMusic();
+                              } else {
+                                setTimeout(() => {
+                                  if (audioRef.current) {
+                                    audioRef.current.load();
+                                    audioRef.current.play().catch(err => console.log(err));
+                                  }
+                                }, 100);
+                              }
+                            }}
+                            className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-3 ${
+                              isThisPlaying 
+                                ? 'bg-music-red/20 text-music-red border border-music-red/30' 
+                                : 'text-slate-300 hover:bg-white/5 hover:text-music-gold border border-transparent'
+                            }`}
+                          >
+                            <div className="w-4 flex justify-center shrink-0">
+                              {isThisPlaying && isMusicPlaying ? (
+                                <motion.div className="flex gap-[2px] h-3 items-end">
+                                  <motion.div animate={{ height: ["4px", "12px", "4px"] }} transition={{ duration: 0.8, repeat: Infinity }} className="w-1 bg-music-red rounded-t-sm" />
+                                  <motion.div animate={{ height: ["8px", "4px", "8px"] }} transition={{ duration: 0.8, repeat: Infinity, delay: 0.2 }} className="w-1 bg-music-red rounded-t-sm" />
+                                  <motion.div animate={{ height: ["12px", "6px", "12px"] }} transition={{ duration: 0.8, repeat: Infinity, delay: 0.4 }} className="w-1 bg-music-red rounded-t-sm" />
+                                </motion.div>
+                              ) : (
+                                <FaPlay className={`text-[8px] ${isThisPlaying ? 'text-music-red' : 'opacity-50'}`} />
+                              )}
+                            </div>
+                            <span className="flex-1 truncate">{track.title}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </motion.div>
                 )}
