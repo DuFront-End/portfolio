@@ -18,7 +18,7 @@ const Hero = () => {
     const { profile } = useProfile()
 
     const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
-    let cvHref = profile?.cvUrl 
+    const cvHref = profile?.cvUrl 
         ? (profile.cvUrl.startsWith('http') 
             ? profile.cvUrl 
             : (profile.cvUrl === '/cv.pdf' 
@@ -26,18 +26,28 @@ const Hero = () => {
                 : `${apiUrl}${profile.cvUrl.startsWith('/') ? '' : '/'}${profile.cvUrl}`))
         : '/cv.pdf';
 
-    // Fix Cloudinary PDF: phải dùng /raw/upload/ thay vì /image/upload/
-    if (cvHref.includes('res.cloudinary.com') && cvHref.endsWith('.pdf')) {
-        cvHref = cvHref.replace('/image/upload/', '/raw/upload/');
-    }
-
-    // Force Cloudinary to download instead of opening in a new tab
-    if (cvHref.includes('res.cloudinary.com') && !cvHref.includes('fl_attachment')) {
-        const parts = cvHref.split('/upload/');
-        if (parts.length === 2) {
-            cvHref = `${parts[0]}/upload/fl_attachment/${parts[1]}`;
+    // Tải CV xuống bằng fetch+blob để hoạt động đúng với Cloudinary (mọi resource_type)
+    const handleDownloadCV = async (e: React.MouseEvent) => {
+        // Nếu là file local /cv.pdf thì để trình duyệt xử lý bình thường
+        if (cvHref === '/cv.pdf') return;
+        
+        e.preventDefault();
+        try {
+            const response = await fetch(cvHref);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Nguyen-Khanh-Du-CV.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            // Fallback: mở trong tab mới nếu fetch thất bại
+            window.open(cvHref, '_blank');
         }
-    }
+    };
 
     return (
         <section
@@ -251,8 +261,8 @@ const Hero = () => {
 
                         <motion.a
                             href={cvHref}
+                            onClick={handleDownloadCV}
                             download={cvHref === '/cv.pdf' ? "Nguyen-Khanh-Du-CV.pdf" : undefined}
-                            target={cvHref.startsWith('http') && !cvHref.includes('fl_attachment') ? "_blank" : undefined}
                             whileHover={{
                                 scale: 1.05,
                                 boxShadow:
