@@ -257,7 +257,7 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                             >
                                 <FaTimes className="w-5 h-5 sm:w-4 sm:h-4" />
                             </button>
-                            <div className="relative flex-1 h-[55dvh] md:h-full bg-black flex items-center justify-center group/gallery overflow-hidden select-none border-b md:border-b-0 md:border-r border-white/5">
+                            <div className="relative w-full h-[40dvh] md:h-full md:flex-1 bg-black/95 flex items-center justify-center group/gallery overflow-hidden select-none border-b md:border-b-0 md:border-r border-white/10 shrink-0">
                                 
                                 {(() => {
                                     const album = [
@@ -282,7 +282,7 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                                 src={curImg} 
                                                 alt={activeAchievement.title}
                                                 className={clsx(
-                                                    "max-w-full max-h-[45dvh] md:max-h-[65vh] w-auto h-auto object-contain p-4 md:p-8 drop-shadow-2xl select-none touch-none",
+                                                    "max-w-full max-h-[35dvh] md:max-h-[75vh] w-auto h-auto object-contain p-4 md:p-8 drop-shadow-2xl select-none touch-none",
                                                     album.length > 1 ? "cursor-grab active:cursor-grabbing" : ""
                                                 )}
                                                 initial={{ opacity: 0, scale: 0.95 }}
@@ -303,7 +303,7 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                             />
 
                                             {currentDesc && (
-                                                <div className="absolute bottom-10 md:bottom-12 left-0 w-full px-4 flex justify-center pointer-events-none z-30">
+                                                <div className="absolute bottom-6 md:bottom-12 left-0 w-full px-4 flex justify-center pointer-events-none z-30">
                                                     <div className="bg-black/80 backdrop-blur-md border border-white/10 px-4 py-2 rounded-xl text-center max-w-[90%] shadow-2xl">
                                                         <p className="text-sm md:text-base text-music-cream font-medium shadow-black drop-shadow-md">
                                                             {currentDesc}
@@ -320,25 +320,25 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                                     </div>
                                                     <button 
                                                         onClick={() => setActivePhotoIndex((p) => (p - 1 + album.length) % album.length)}
-                                                        className="absolute left-3 p-2.5 sm:p-3 rounded-full bg-black/60 border border-white/5 hover:bg-music-red/90 text-white md:opacity-0 md:group-hover/gallery:opacity-100 transition-all active:scale-90 cursor-pointer z-20"
+                                                        className="absolute left-2 md:left-3 p-2 md:p-3 rounded-full bg-black/60 border border-white/5 hover:bg-music-red/90 text-white md:opacity-0 md:group-hover/gallery:opacity-100 transition-all active:scale-90 cursor-pointer z-20"
                                                     >
                                                         <FaChevronLeft className="text-xs sm:text-sm" />
                                                     </button>
                                                     <button 
                                                         onClick={() => setActivePhotoIndex((p) => (p + 1) % album.length)}
-                                                        className="absolute right-3 p-2.5 sm:p-3 rounded-full bg-black/60 border border-white/5 hover:bg-music-red/90 text-white md:opacity-0 md:group-hover/gallery:opacity-100 transition-all active:scale-90 cursor-pointer z-20"
+                                                        className="absolute right-2 md:right-3 p-2 md:p-3 rounded-full bg-black/60 border border-white/5 hover:bg-music-red/90 text-white md:opacity-0 md:group-hover/gallery:opacity-100 transition-all active:scale-90 cursor-pointer z-20"
                                                     >
                                                         <FaChevronRight className="text-xs sm:text-sm" />
                                                     </button>
 
-                                                    <div className="absolute bottom-3 sm:bottom-4 left-1/2 transform -translate-x-1/2 flex gap-1.5 z-20">
+                                                    <div className="absolute bottom-2 md:bottom-4 left-1/2 transform -translate-x-1/2 flex gap-1.5 z-20">
                                                         {album.map((_, idx) => (
                                                             <button
                                                                 key={idx}
                                                                 onClick={() => setActivePhotoIndex(idx)}
                                                                 className={clsx(
                                                                     "h-1 sm:h-1.5 rounded-full transition-all cursor-pointer",
-                                                                    (activePhotoIndex % album.length) === idx ? "w-4 sm:w-6 bg-music-red" : "w-1 sm:w-1.5 bg-white/30 hover:bg-white/60"
+                                                                    (activePhotoIndex % album.length) === idx ? "w-4 sm:w-6 bg-music-red" : "w-1.5 bg-white/30 hover:bg-white/60"
                                                                 )}
                                                             />
                                                         ))}
@@ -350,17 +350,17 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                 })()}
                             </div>
 
-                            <div className="w-full md:w-[380px] bg-[#0a0e17] p-5 sm:p-7 flex flex-col justify-between shrink-0 h-[45dvh] md:h-auto overflow-y-auto custom-main-scrollbar">
-                                <div className="space-y-3.5">
-                                    <span className={clsx("inline-block text-[9px] font-mono tracking-widest uppercase py-1 px-2.5 border rounded-lg bg-white/5", activeAchievement.color, activeAchievement.borderColor)}>
+                            <div className="w-full md:w-[420px] bg-[#0a0e17] p-6 md:p-8 flex flex-col shrink-0 flex-1 md:flex-none overflow-y-auto custom-main-scrollbar">
+                                <div className="space-y-4">
+                                    <span className={clsx("inline-block text-[10px] font-mono tracking-widest uppercase py-1.5 px-3 border rounded-lg bg-white/5", activeAchievement.color, activeAchievement.borderColor)}>
                                         {activeAchievement.period}
                                     </span>
 
-                                    <h3 className="text-lg sm:text-xl font-extrabold text-music-cream leading-tight font-sans border-b border-white/5 pb-3">
+                                    <h3 className="text-xl md:text-2xl font-extrabold text-white leading-tight font-sans border-b border-white/10 pb-4">
                                         <AutoTranslate text={activeAchievement.title} />
                                     </h3>
 
-                                    <p className="text-xs sm:text-sm text-music-cream/75 leading-relaxed max-h-[120px] md:max-h-[240px] overflow-y-auto pr-1 custom-scrollbar font-sans">
+                                    <p className="text-sm text-slate-300 leading-relaxed font-sans pb-2">
                                         <AutoTranslate text={activeAchievement.description} />
                                     </p>
                                 </div>
