@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaPlay, FaPause, FaStepForward } from 'react-icons/fa'
+import { FaPlay, FaPause, FaStepForward, FaListUl } from 'react-icons/fa'
 import { useTranslation } from 'react-i18next'
 import AutoTranslate from '../common/AutoTranslate'
 
 const FALLBACK_PLAYLIST = [
-  { id: 0, title: "Lofi Study", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+  { id: 0, title: "Lofi Study", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", genre: "Lofi" },
 ]
 
 interface MusicPlayerProps {
@@ -16,8 +16,32 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
   const { t } = useTranslation()
   const [isMusicPlaying, setIsMusicPlaying] = useState(false)
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0)
+  const [allTracks, setAllTracks] = useState(FALLBACK_PLAYLIST)
   const [playlist, setPlaylist] = useState(FALLBACK_PLAYLIST)
+  const [selectedGenre, setSelectedGenre] = useState<string>('All')
+  const [isGenreDropdownOpen, setIsGenreDropdownOpen] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  const genres = useMemo(() => {
+    const uniqueGenres = new Set(allTracks.map(t => t.genre).filter(Boolean));
+    return ['All', ...Array.from(uniqueGenres)];
+  }, [allTracks]);
+
+  useEffect(() => {
+    const filtered = selectedGenre === 'All' 
+      ? allTracks 
+      : allTracks.filter(t => t.genre === selectedGenre);
+    setPlaylist(filtered.length > 0 ? filtered : allTracks); // fallback to all if empty
+    setCurrentTrackIndex(0);
+    if (isMusicPlaying) {
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.load();
+          audioRef.current.play().catch(e => console.log(e));
+        }
+      }, 100);
+    }
+  }, [selectedGenre, allTracks]);
 
   useEffect(() => {
     onMusicStateChange?.(isMusicPlaying)
@@ -35,8 +59,9 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
             id: index,
             title: item.title,
             url: item.url,
+            genre: item.genre || 'Nhạc Trẻ',
           }));
-          setPlaylist(formattedPlaylist.length > 0 ? formattedPlaylist : FALLBACK_PLAYLIST);
+          setAllTracks(formattedPlaylist.length > 0 ? formattedPlaylist : FALLBACK_PLAYLIST);
         }
       } catch (error) {
         console.error('❌ Failed to fetch playlist:', error);
@@ -207,6 +232,60 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
                 </motion.button>
               )}
             </AnimatePresence>
+
+            {/* Genre Selector */}
+            <div className="relative">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsGenreDropdownOpen(!isGenreDropdownOpen);
+                }}
+                className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-all backdrop-blur-sm ${
+                  isGenreDropdownOpen 
+                    ? 'bg-music-red/20 border-music-red text-music-red' 
+                    : 'bg-music-blue/40 border-music-gold/20 text-music-gold hover:border-music-red hover:text-music-red'
+                }`}
+              >
+                <FaListUl className="text-xs" />
+              </motion.button>
+
+              <AnimatePresence>
+                {isGenreDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                    className="absolute bottom-full right-0 mb-3 w-40 bg-slate-900/95 backdrop-blur-xl border border-music-gold/30 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.8)] overflow-hidden z-[120]"
+                  >
+                    <div className="p-2 border-b border-music-gold/10 text-center">
+                      <span className="text-[10px] font-tech text-music-gold tracking-widest uppercase">Thể Loại</span>
+                    </div>
+                    <div className="max-h-48 overflow-y-auto custom-scrollbar p-1.5 space-y-1">
+                      {genres.map(genre => (
+                        <button
+                          key={genre}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedGenre(genre);
+                            setIsGenreDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-between ${
+                            selectedGenre === genre 
+                              ? 'bg-music-red/20 text-music-red border border-music-red/30' 
+                              : 'text-slate-300 hover:bg-white/5 hover:text-music-gold border border-transparent'
+                          }`}
+                        >
+                          {genre === 'All' ? 'Tất cả' : genre}
+                          {selectedGenre === genre && <FaPlay className="text-[8px]" />}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             <motion.div 
               className="relative cursor-pointer group" 
