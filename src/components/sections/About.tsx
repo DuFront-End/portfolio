@@ -32,7 +32,7 @@ const About = ({ activeSection }: { activeSection?: string }) => {
                     </span>
                 </h2>
 
-                <div className="grid lg:grid-cols-2 gap-12 items-center">
+                <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center mt-4 sm:mt-0">
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -40,7 +40,7 @@ const About = ({ activeSection }: { activeSection?: string }) => {
                         transition={{ duration: 0.6, delay: 0.2 }}
                         className="relative"
                     >
-                        <div className="relative w-96 h-96 mx-auto lg:mx-0">
+                        <div className="relative w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] lg:w-96 lg:h-96 mx-auto lg:mx-0">
                             <motion.div
                                 animate={{ rotate: 360 }}
                                 transition={{
@@ -53,7 +53,7 @@ const About = ({ activeSection }: { activeSection?: string }) => {
                                 <GiCompactDisc className="w-full h-full p-2 text-music-dark/20" />
                             </motion.div>
 
-                            <div className="absolute inset-10 rounded-full music-card flex items-center justify-center z-10">
+                            <div className="absolute inset-4 sm:inset-8 lg:inset-10 rounded-full music-card flex items-center justify-center z-10">
                                 <div className="text-center">
                                     <motion.div
                                         animate={{ rotate: 360 }}
@@ -62,7 +62,7 @@ const About = ({ activeSection }: { activeSection?: string }) => {
                                             repeat: Infinity,
                                             ease: 'linear',
                                         }}
-                                        className="relative w-44 h-44 rounded-full overflow-hidden bg-music-dark border-4 border-music-red/30 mx-auto mb-2"
+                                        className="relative w-32 h-32 sm:w-40 sm:h-40 lg:w-44 lg:h-44 rounded-full overflow-hidden bg-music-dark border-4 border-music-red/30 mx-auto mb-3 sm:mb-2"
                                     >
                                         <img
                                             src={avatarUrl}
@@ -78,20 +78,21 @@ const About = ({ activeSection }: { activeSection?: string }) => {
                                         </div>
                                     </motion.div>
 
-                                    <p className="text-[10px] text-music-gold font-tech uppercase tracking-widest">
+                                    <p className="text-[10px] sm:text-xs text-music-gold font-tech uppercase tracking-widest mt-1 sm:mt-0">
                                         {profile?.role ? <AutoTranslate text={profile.role} /> : <AutoTranslate text={t('hero.role')} />}
                                     </p>
                                 </div>
                             </div>
 
-                            {[...Array(4)].map((_, i) => (
+                            {[
+                                "top-1/2 -right-3 sm:-right-4 -translate-y-1/2",
+                                "left-1/2 -bottom-3 sm:-bottom-4 -translate-x-1/2",
+                                "top-1/2 -left-3 sm:-left-4 -translate-y-1/2",
+                                "left-1/2 -top-3 sm:-top-4 -translate-x-1/2"
+                            ].map((pos, i) => (
                                 <motion.div
                                     key={i}
-                                    className="absolute z-20"
-                                    style={{
-                                        left: `${Math.cos((i * Math.PI) / 2) * 185 + 185}px`,
-                                        top: `${Math.sin((i * Math.PI) / 2) * 185 + 185}px`,
-                                    }}
+                                    className={`absolute z-20 flex items-center justify-center w-8 h-8 sm:w-auto sm:h-auto ${pos}`}
                                     animate={{
                                         rotate: 360,
                                         scale: [1, 1.2, 1],
@@ -122,12 +123,12 @@ const About = ({ activeSection }: { activeSection?: string }) => {
                         transition={{ duration: 0.6, delay: 0.4 }}
                         className="space-y-8"
                     >
-                        <div className="music-card p-8">
-                            <p className="text-lg text-music-cream/80 leading-relaxed mb-6">
+                        <div className="music-card p-6 sm:p-8">
+                            <p className="text-base sm:text-lg text-music-cream/80 leading-relaxed mb-6">
                                 {profile?.aboutDescription ? <AutoTranslate text={profile.aboutDescription} /> : <AutoTranslate text={t('about.description')} />}
                             </p>
 
-                            <div className="grid sm:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {(profile?.aboutStats || [
                                     { label: 'Điểm GPA', value: '3.65/4.0', icon: 'FaGraduationCap' },
                                     { label: 'Trạng thái', value: 'Sinh viên Xuất sắc', icon: 'FaAward' }
