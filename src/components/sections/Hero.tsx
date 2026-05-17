@@ -26,6 +26,11 @@ const Hero = () => {
                 : `${apiUrl}${profile.cvUrl.startsWith('/') ? '' : '/'}${profile.cvUrl}`))
         : '/cv.pdf';
 
+    // Fix Cloudinary PDF: phải dùng /raw/upload/ thay vì /image/upload/
+    if (cvHref.includes('res.cloudinary.com') && cvHref.endsWith('.pdf')) {
+        cvHref = cvHref.replace('/image/upload/', '/raw/upload/');
+    }
+
     // Force Cloudinary to download instead of opening in a new tab
     if (cvHref.includes('res.cloudinary.com') && !cvHref.includes('fl_attachment')) {
         const parts = cvHref.split('/upload/');
