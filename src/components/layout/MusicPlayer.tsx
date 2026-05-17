@@ -21,9 +21,22 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
   const [selectedGenre, setSelectedGenre] = useState<string>('All')
   const [isGenreDropdownOpen, setIsGenreDropdownOpen] = useState(false)
   const [isPlaylistDropdownOpen, setIsPlaylistDropdownOpen] = useState(false)
+  const [isMenuExpanded, setIsMenuExpanded] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
+  const [isAiChatOpen, setIsAiChatOpen] = useState(false)
   const lastScrollY = useRef(0)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  useEffect(() => {
+    const isOpen = isGenreDropdownOpen || isPlaylistDropdownOpen;
+    window.dispatchEvent(new CustomEvent('music-drawer-state', { detail: isOpen }));
+  }, [isGenreDropdownOpen, isPlaylistDropdownOpen]);
+
+  useEffect(() => {
+    const handleAiState = (e: any) => setIsAiChatOpen(e.detail);
+    window.addEventListener('ai-chat-state', handleAiState);
+    return () => window.removeEventListener('ai-chat-state', handleAiState);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -206,11 +219,11 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
       {playlist.length > 0 && (
         <motion.div 
           animate={{ 
-            y: isVisible || isGenreDropdownOpen || isPlaylistDropdownOpen ? 0 : 150,
-            opacity: isVisible || isGenreDropdownOpen || isPlaylistDropdownOpen ? 1 : 0 
+            y: (isVisible || isGenreDropdownOpen || isPlaylistDropdownOpen) && !isAiChatOpen ? 0 : 150,
+            opacity: (isVisible || isGenreDropdownOpen || isPlaylistDropdownOpen) && !isAiChatOpen ? 1 : 0 
           }}
           transition={{ duration: 0.3 }}
-          className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[100] flex flex-col items-end gap-3 sm:gap-6"
+          className={`fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[100] flex flex-col items-end gap-3 sm:gap-6 ${isAiChatOpen ? 'pointer-events-none' : ''}`}
         >
           <AnimatePresence mode="wait">
             {isMusicPlaying ? (
@@ -263,188 +276,208 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
               )}
             </AnimatePresence>
 
-            {/* Genre Selector */}
-            <div className="relative group/genre flex flex-col items-center gap-1 sm:gap-0">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsGenreDropdownOpen(!isGenreDropdownOpen);
-                  setIsPlaylistDropdownOpen(false);
-                }}
-                className={`w-10 h-10 sm:w-9 sm:h-9 rounded-full sm:rounded-lg border flex items-center justify-center transition-all backdrop-blur-sm ${
-                  isGenreDropdownOpen 
-                    ? 'bg-music-red/20 border-music-red text-music-red shadow-[0_0_15px_rgba(233,69,96,0.3)]' 
-                    : 'bg-music-blue/40 border-music-gold/20 text-music-gold hover:border-music-red hover:text-music-red'
-                }`}
-              >
-                <FaListUl className="text-sm sm:text-xs" />
-              </motion.button>
-              <span className="sm:hidden text-[8px] font-bold text-music-gold uppercase tracking-widest bg-black/40 px-1.5 py-0.5 rounded backdrop-blur-md">
-                Thể loại
-              </span>
-
-              <div className="hidden sm:block absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover/genre:opacity-100 transition-opacity pointer-events-none whitespace-nowrap bg-slate-900/90 text-music-gold text-[10px] px-2 py-1 rounded-md border border-music-gold/30 shadow-lg z-[130]">
-                Thể loại
-              </div>
-
-              <AnimatePresence>
-                {isGenreDropdownOpen && (
-                  <>
-                    <motion.div 
-                      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                      className="fixed inset-0 bg-black/60 z-[115] sm:hidden"
+            <AnimatePresence>
+              {(isMenuExpanded || window.innerWidth >= 640) && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, height: 'auto', scale: 1 }}
+                  exit={{ opacity: 0, height: 0, scale: 0.8 }}
+                  className="flex flex-col items-end gap-3 sm:gap-6 sm:!opacity-100 sm:!scale-100 sm:!h-auto"
+                >
+                  {/* Genre Selector */}
+                  <div className="relative group/genre flex flex-col items-center gap-1 sm:gap-0">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        setIsGenreDropdownOpen(false);
-                      }}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, x: "100%" }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: "100%" }}
-                      transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                      className="fixed top-0 right-0 h-[100dvh] w-[80vw] max-w-[320px] bg-slate-900/98 backdrop-blur-xl border-l border-music-gold/30 shadow-2xl z-[120] flex flex-col sm:absolute sm:bottom-full sm:top-auto sm:right-0 sm:h-auto sm:w-48 sm:rounded-xl sm:border-t sm:shadow-[0_0_30px_rgba(0,0,0,0.8)] sm:transform-none"
-                    >
-                      <div className="p-4 sm:p-2 border-b border-music-gold/10 text-center relative shrink-0 mt-8 sm:mt-0">
-                        <span className="text-xs sm:text-[10px] font-tech text-music-gold tracking-widest uppercase">Chọn Thể Loại</span>
-                        <button 
-                          className="sm:hidden absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 p-2"
-                          onClick={(e) => { e.stopPropagation(); setIsGenreDropdownOpen(false); }}
-                        >
-                          ✕
-                        </button>
-                      </div>
-                      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-1.5 space-y-2 sm:space-y-1 pb-10 sm:pb-1.5 sm:max-h-48">
-                        {genres.map(genre => (
-                          <button
-                            key={genre}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedGenre(genre);
-                              setIsGenreDropdownOpen(false);
-                            }}
-                            className={`w-full text-left px-4 sm:px-3 py-3 sm:py-2 rounded-lg text-sm sm:text-xs font-semibold transition-all flex items-center justify-between ${
-                              selectedGenre === genre 
-                                ? 'bg-music-red/20 text-music-red border border-music-red/30' 
-                                : 'text-slate-300 hover:bg-white/5 hover:text-music-gold border border-transparent'
-                            }`}
-                          >
-                            {genre === 'All' ? 'Tất cả' : genre}
-                            {selectedGenre === genre && <FaPlay className="text-[10px] sm:text-[8px]" />}
-                          </button>
-                        ))}
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Playlist Viewer Selector */}
-            <div className="relative group/playlist flex flex-col items-center gap-1 sm:gap-0">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsPlaylistDropdownOpen(!isPlaylistDropdownOpen);
-                  setIsGenreDropdownOpen(false);
-                }}
-                className={`w-10 h-10 sm:w-9 sm:h-9 rounded-full sm:rounded-lg border flex items-center justify-center transition-all backdrop-blur-sm ${
-                  isPlaylistDropdownOpen 
-                    ? 'bg-music-red/20 border-music-red text-music-red shadow-[0_0_15px_rgba(233,69,96,0.3)]' 
-                    : 'bg-music-blue/40 border-music-gold/20 text-music-gold hover:border-music-red hover:text-music-red'
-                }`}
-              >
-                <FaMusic className="text-sm sm:text-xs" />
-              </motion.button>
-              <span className="sm:hidden text-[8px] font-bold text-music-gold uppercase tracking-widest bg-black/40 px-1.5 py-0.5 rounded backdrop-blur-md">
-                Bài hát
-              </span>
-
-              <div className="hidden sm:block absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover/playlist:opacity-100 transition-opacity pointer-events-none whitespace-nowrap bg-slate-900/90 text-music-gold text-[10px] px-2 py-1 rounded-md border border-music-gold/30 shadow-lg z-[130]">
-                Bài hát
-              </div>
-
-              <AnimatePresence>
-                {isPlaylistDropdownOpen && (
-                  <>
-                    <motion.div 
-                      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                      className="fixed inset-0 bg-black/60 z-[115] sm:hidden"
-                      onClick={(e) => {
-                        e.stopPropagation();
+                        setIsGenreDropdownOpen(!isGenreDropdownOpen);
                         setIsPlaylistDropdownOpen(false);
                       }}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, x: "100%" }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: "100%" }}
-                      transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                      className="fixed top-0 right-0 h-[100dvh] w-[80vw] max-w-[320px] bg-slate-900/98 backdrop-blur-xl border-l border-music-gold/30 shadow-2xl z-[120] flex flex-col sm:absolute sm:bottom-full sm:top-auto sm:right-0 sm:h-auto sm:w-72 sm:rounded-xl sm:border-t sm:shadow-[0_0_30px_rgba(0,0,0,0.8)] sm:transform-none"
+                      className={`w-10 h-10 sm:w-9 sm:h-9 rounded-full sm:rounded-lg border flex items-center justify-center transition-all backdrop-blur-sm ${
+                        isGenreDropdownOpen 
+                          ? 'bg-music-red/20 border-music-red text-music-red shadow-[0_0_15px_rgba(233,69,96,0.3)]' 
+                          : 'bg-music-blue/40 border-music-gold/20 text-music-gold hover:border-music-red hover:text-music-red'
+                      }`}
                     >
-                      <div className="p-4 sm:p-3 border-b border-music-gold/10 flex items-center justify-between relative shrink-0 mt-8 sm:mt-0">
-                        <button 
-                          className="sm:hidden text-slate-400 p-2 mr-2"
-                          onClick={(e) => { e.stopPropagation(); setIsPlaylistDropdownOpen(false); }}
-                        >
-                          ✕
-                        </button>
-                        <span className="text-xs sm:text-[10px] font-tech text-music-gold tracking-widest uppercase flex-1 text-center sm:text-left">Danh sách nhạc</span>
-                        <div className="flex items-center gap-4">
-                          <span className="text-[10px] text-slate-400 font-bold">{playlist.length} bài</span>
-                        </div>
-                      </div>
-                      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-1.5 space-y-2 sm:space-y-1 pb-10 sm:pb-1.5 sm:max-h-72">
-                        {playlist.map((track, idx) => {
-                          const isThisPlaying = currentTrackIndex === idx;
-                          return (
-                            <button
-                              key={track.id || idx}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setCurrentTrackIndex(idx);
-                                if (!isMusicPlaying) {
-                                  toggleMusic();
-                                } else {
-                                  setTimeout(() => {
-                                    if (audioRef.current) {
-                                      audioRef.current.load();
-                                      audioRef.current.play().catch(err => console.log(err));
-                                    }
-                                  }, 100);
-                                }
-                              }}
-                              className={`w-full text-left px-4 sm:px-3 py-3 sm:py-2.5 rounded-lg text-sm sm:text-xs font-semibold transition-all flex items-center gap-3 ${
-                                isThisPlaying 
-                                  ? 'bg-music-red/20 text-music-red border border-music-red/30' 
-                                  : 'text-slate-300 hover:bg-white/5 hover:text-music-gold border border-transparent'
-                              }`}
-                            >
-                              <div className="w-5 sm:w-4 flex justify-center shrink-0">
-                                {isThisPlaying && isMusicPlaying ? (
-                                  <motion.div className="flex gap-[2px] h-3 items-end">
-                                    <motion.div animate={{ height: ["4px", "12px", "4px"] }} transition={{ duration: 0.8, repeat: Infinity }} className="w-1 bg-music-red rounded-t-sm" />
-                                    <motion.div animate={{ height: ["8px", "4px", "8px"] }} transition={{ duration: 0.8, repeat: Infinity, delay: 0.2 }} className="w-1 bg-music-red rounded-t-sm" />
-                                    <motion.div animate={{ height: ["12px", "6px", "12px"] }} transition={{ duration: 0.8, repeat: Infinity, delay: 0.4 }} className="w-1 bg-music-red rounded-t-sm" />
-                                  </motion.div>
-                                ) : (
-                                  <FaPlay className={`text-[10px] sm:text-[8px] ${isThisPlaying ? 'text-music-red' : 'opacity-50'}`} />
-                                )}
+                      <FaListUl className="text-sm sm:text-xs" />
+                    </motion.button>
+                    <span className="sm:hidden text-[8px] font-bold text-music-gold uppercase tracking-widest bg-black/40 px-1.5 py-0.5 rounded backdrop-blur-md">
+                      Thể loại
+                    </span>
+
+                    <div className="hidden sm:block absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover/genre:opacity-100 transition-opacity pointer-events-none whitespace-nowrap bg-slate-900/90 text-music-gold text-[10px] px-2 py-1 rounded-md border border-music-gold/30 shadow-lg z-[130]">
+                      Thể loại
+                    </div>
+
+                    <AnimatePresence>
+                      {isGenreDropdownOpen && (
+                        <>
+                          <motion.div 
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/60 z-[115] sm:hidden"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsGenreDropdownOpen(false);
+                            }}
+                          />
+                          <motion.div
+                            initial={{ opacity: 0, x: "100%" }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: "100%" }}
+                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                            className="fixed top-0 right-0 h-[100dvh] w-[80vw] max-w-[320px] bg-slate-900/98 backdrop-blur-xl border-l border-music-gold/30 shadow-2xl z-[120] flex flex-col sm:absolute sm:bottom-full sm:top-auto sm:right-0 sm:h-auto sm:w-48 sm:rounded-xl sm:border-t sm:shadow-[0_0_30px_rgba(0,0,0,0.8)] sm:transform-none"
+                          >
+                            <div className="p-4 sm:p-2 border-b border-music-gold/10 text-center relative shrink-0 mt-8 sm:mt-0">
+                              <span className="text-xs sm:text-[10px] font-tech text-music-gold tracking-widest uppercase">Chọn Thể Loại</span>
+                              <button 
+                                className="sm:hidden absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 p-2"
+                                onClick={(e) => { e.stopPropagation(); setIsGenreDropdownOpen(false); }}
+                              >
+                                ✕
+                              </button>
+                            </div>
+                            <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-1.5 space-y-2 sm:space-y-1 pb-10 sm:pb-1.5 sm:max-h-48">
+                              {genres.map(genre => (
+                                <button
+                                  key={genre}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedGenre(genre);
+                                    setIsGenreDropdownOpen(false);
+                                  }}
+                                  className={`w-full text-left px-4 sm:px-3 py-3 sm:py-2 rounded-lg text-sm sm:text-xs font-semibold transition-all flex items-center justify-between ${
+                                    selectedGenre === genre 
+                                      ? 'bg-music-red/20 text-music-red border border-music-red/30' 
+                                      : 'text-slate-300 hover:bg-white/5 hover:text-music-gold border border-transparent'
+                                  }`}
+                                >
+                                  {genre === 'All' ? 'Tất cả' : genre}
+                                  {selectedGenre === genre && <FaPlay className="text-[10px] sm:text-[8px]" />}
+                                </button>
+                              ))}
+                            </div>
+                          </motion.div>
+                        </>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Playlist Viewer Selector */}
+                  <div className="relative group/playlist flex flex-col items-center gap-1 sm:gap-0">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsPlaylistDropdownOpen(!isPlaylistDropdownOpen);
+                        setIsGenreDropdownOpen(false);
+                      }}
+                      className={`w-10 h-10 sm:w-9 sm:h-9 rounded-full sm:rounded-lg border flex items-center justify-center transition-all backdrop-blur-sm ${
+                        isPlaylistDropdownOpen 
+                          ? 'bg-music-red/20 border-music-red text-music-red shadow-[0_0_15px_rgba(233,69,96,0.3)]' 
+                          : 'bg-music-blue/40 border-music-gold/20 text-music-gold hover:border-music-red hover:text-music-red'
+                      }`}
+                    >
+                      <FaMusic className="text-sm sm:text-xs" />
+                    </motion.button>
+                    <span className="sm:hidden text-[8px] font-bold text-music-gold uppercase tracking-widest bg-black/40 px-1.5 py-0.5 rounded backdrop-blur-md">
+                      Bài hát
+                    </span>
+
+                    <div className="hidden sm:block absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover/playlist:opacity-100 transition-opacity pointer-events-none whitespace-nowrap bg-slate-900/90 text-music-gold text-[10px] px-2 py-1 rounded-md border border-music-gold/30 shadow-lg z-[130]">
+                      Bài hát
+                    </div>
+
+                    <AnimatePresence>
+                      {isPlaylistDropdownOpen && (
+                        <>
+                          <motion.div 
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/60 z-[115] sm:hidden"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsPlaylistDropdownOpen(false);
+                            }}
+                          />
+                          <motion.div
+                            initial={{ opacity: 0, x: "100%" }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: "100%" }}
+                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                            className="fixed top-0 right-0 h-[100dvh] w-[80vw] max-w-[320px] bg-slate-900/98 backdrop-blur-xl border-l border-music-gold/30 shadow-2xl z-[120] flex flex-col sm:absolute sm:bottom-full sm:top-auto sm:right-0 sm:h-auto sm:w-72 sm:rounded-xl sm:border-t sm:shadow-[0_0_30px_rgba(0,0,0,0.8)] sm:transform-none"
+                          >
+                            <div className="p-4 sm:p-3 border-b border-music-gold/10 flex items-center justify-between relative shrink-0 mt-8 sm:mt-0">
+                              <button 
+                                className="sm:hidden text-slate-400 p-2 mr-2"
+                                onClick={(e) => { e.stopPropagation(); setIsPlaylistDropdownOpen(false); }}
+                              >
+                                ✕
+                              </button>
+                              <span className="text-xs sm:text-[10px] font-tech text-music-gold tracking-widest uppercase flex-1 text-center sm:text-left">Danh sách nhạc</span>
+                              <div className="flex items-center gap-4">
+                                <span className="text-[10px] text-slate-400 font-bold">{playlist.length} bài</span>
                               </div>
-                              <span className="flex-1 truncate">{track.title}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
-            </div>
+                            </div>
+                            <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-1.5 space-y-2 sm:space-y-1 pb-10 sm:pb-1.5 sm:max-h-72">
+                              {playlist.map((track, idx) => {
+                                const isThisPlaying = currentTrackIndex === idx;
+                                return (
+                                  <button
+                                    key={track.id || idx}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setCurrentTrackIndex(idx);
+                                      if (!isMusicPlaying) {
+                                        toggleMusic();
+                                      } else {
+                                        setTimeout(() => {
+                                          if (audioRef.current) {
+                                            audioRef.current.load();
+                                            audioRef.current.play().catch(err => console.log(err));
+                                          }
+                                        }, 100);
+                                      }
+                                    }}
+                                    className={`w-full text-left px-4 sm:px-3 py-3 sm:py-2.5 rounded-lg text-sm sm:text-xs font-semibold transition-all flex items-center gap-3 ${
+                                      isThisPlaying 
+                                        ? 'bg-music-red/20 text-music-red border border-music-red/30' 
+                                        : 'text-slate-300 hover:bg-white/5 hover:text-music-gold border border-transparent'
+                                    }`}
+                                  >
+                                    <div className="w-5 sm:w-4 flex justify-center shrink-0">
+                                      {isThisPlaying && isMusicPlaying ? (
+                                        <motion.div className="flex gap-[2px] h-3 items-end">
+                                          <motion.div animate={{ height: ["4px", "12px", "4px"] }} transition={{ duration: 0.8, repeat: Infinity }} className="w-1 bg-music-red rounded-t-sm" />
+                                          <motion.div animate={{ height: ["8px", "4px", "8px"] }} transition={{ duration: 0.8, repeat: Infinity, delay: 0.2 }} className="w-1 bg-music-red rounded-t-sm" />
+                                          <motion.div animate={{ height: ["12px", "6px", "12px"] }} transition={{ duration: 0.8, repeat: Infinity, delay: 0.4 }} className="w-1 bg-music-red rounded-t-sm" />
+                                        </motion.div>
+                                      ) : (
+                                        <FaPlay className={`text-[10px] sm:text-[8px] ${isThisPlaying ? 'text-music-red' : 'opacity-50'}`} />
+                                      )}
+                                    </div>
+                                    <span className="flex-1 truncate">{track.title}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </motion.div>
+                        </>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <motion.div className="flex flex-col items-center gap-2">
+              <motion.button
+                onClick={() => setIsMenuExpanded(!isMenuExpanded)}
+                className="sm:hidden w-8 h-8 rounded-full bg-slate-900/60 border border-music-gold/30 flex items-center justify-center text-music-gold backdrop-blur-sm z-[110]"
+                animate={{ rotate: isMenuExpanded ? 45 : 0 }}
+              >
+                <span className="text-xl leading-none mt-[-2px]">+</span>
+              </motion.button>
 
             <motion.div 
               className="relative cursor-pointer group" 
@@ -489,6 +522,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
               <div className={`absolute -inset-2 rounded-2xl -z-10 blur-md transition-colors duration-1000
                 ${isMusicPlaying ? 'bg-music-red/15' : 'bg-music-blue/25'}`}
               />
+            </motion.div>
             </motion.div>
           </div>
         </motion.div>
