@@ -182,7 +182,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
       />
 
       {playlist.length > 0 && (
-        <div className="fixed bottom-8 right-8 z-[100] flex flex-col items-end gap-6">
+        <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[100] flex flex-col items-end gap-3 sm:gap-6">
           <AnimatePresence mode="wait">
             {isMusicPlaying ? (
               <motion.div
@@ -203,7 +203,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
                 initial={{ opacity: 0, y: 15, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.9 }}
-                className="relative bg-gradient-to-r from-music-blue/90 to-music-dark/95 border border-music-gold/30 px-4 py-2 backdrop-blur-md rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex items-center gap-3 cursor-pointer select-none hover:border-music-gold transition-colors group"
+                className="hidden sm:flex relative bg-gradient-to-r from-music-blue/90 to-music-dark/95 border border-music-gold/30 px-4 py-2 backdrop-blur-md rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] items-center gap-3 cursor-pointer select-none hover:border-music-gold transition-colors group"
                 onClick={toggleMusic}
               >
                 <div className="relative flex h-2.5 w-2.5">
@@ -227,7 +227,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
                   exit={{ scale: 0 }}
                   whileHover={{ scale: 1.1 }}
                   onClick={nextTrack}
-                  className="w-9 h-9 rounded-lg bg-music-blue/40 border border-music-gold/20 flex items-center justify-center hover:border-music-red transition-all group backdrop-blur-sm"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-music-blue/40 border border-music-gold/20 flex items-center justify-center hover:border-music-red transition-all group backdrop-blur-sm"
                 >
                   <FaStepForward className="text-music-gold group-hover:text-music-red text-xs" />
                 </motion.button>
@@ -244,7 +244,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
                   setIsGenreDropdownOpen(!isGenreDropdownOpen);
                   setIsPlaylistDropdownOpen(false);
                 }}
-                className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-all backdrop-blur-sm ${
+                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg border flex items-center justify-center transition-all backdrop-blur-sm ${
                   isGenreDropdownOpen 
                     ? 'bg-music-red/20 border-music-red text-music-red' 
                     : 'bg-music-blue/40 border-music-gold/20 text-music-gold hover:border-music-red hover:text-music-red'
@@ -303,7 +303,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
                   setIsPlaylistDropdownOpen(!isPlaylistDropdownOpen);
                   setIsGenreDropdownOpen(false);
                 }}
-                className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-all backdrop-blur-sm ${
+                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg border flex items-center justify-center transition-all backdrop-blur-sm ${
                   isPlaylistDropdownOpen 
                     ? 'bg-music-red/20 border-music-red text-music-red' 
                     : 'bg-music-blue/40 border-music-gold/20 text-music-gold hover:border-music-red hover:text-music-red'
@@ -384,9 +384,9 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
               <motion.div
                 animate={{ rotate: isMusicPlaying ? -12 : -45 }}
                 transition={{ type: "spring", stiffness: 60 }}
-                className="absolute -top-5 -right-1 w-14 h-1.5 bg-gradient-to-l from-music-gold to-music-cream rounded-full z-[110] origin-right shadow-lg"
+                className="absolute -top-4 -right-1 sm:-top-5 sm:-right-1 w-10 sm:w-14 h-1 sm:h-1.5 bg-gradient-to-l from-music-gold to-music-cream rounded-full z-[110] origin-right shadow-lg"
               >
-                <div className="absolute left-0 top-0 w-3.5 h-4 bg-music-dark border border-music-gold/50 rounded-sm -rotate-12 shadow-md" />
+                <div className="absolute left-0 top-0 w-2.5 sm:w-3.5 h-3 sm:h-4 bg-music-dark border border-music-gold/50 rounded-sm -rotate-12 shadow-md" />
               </motion.div>
 
               <motion.div
@@ -396,7 +396,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onMusicStateChange }) => {
                   boxShadow: ['0 0 30px rgba(233, 69, 96, 0.4)', '0 0 50px rgba(233, 69, 96, 0.75)', '0 0 30px rgba(233, 69, 96, 0.4)']
                 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                className={`w-20 h-20 rounded-full relative flex items-center justify-center vinyl-rings overflow-hidden border-2 transition-colors duration-700
+                className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full relative flex items-center justify-center vinyl-rings overflow-hidden border-2 transition-colors duration-700
                   ${isMusicPlaying ? 'border-music-red' : 'border-music-gold/40 group-hover:border-music-gold'}`}
               >
                 <motion.div

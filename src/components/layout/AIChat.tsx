@@ -104,17 +104,14 @@ const AIChat: React.FC = () => {
           ] 
         }}
         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        className="fixed bottom-24 left-4 sm:bottom-8 sm:left-8 z-[100] p-1.5 sm:p-3 rounded-full sm:rounded-2xl bg-[#0a192f]/90 backdrop-blur-xl border-2 border-cyan-500/40 hover:border-cyan-400 shadow-2xl group transition-all duration-300 flex items-center gap-3 sm:gap-0 pr-4 sm:pr-3"
+        className="fixed bottom-4 left-4 sm:bottom-8 sm:left-8 z-[100] p-2 sm:p-3 rounded-full sm:rounded-2xl bg-[#0a192f]/90 backdrop-blur-xl border-2 border-cyan-500/40 hover:border-cyan-400 shadow-2xl group transition-all duration-300 flex items-center justify-center"
       >
         <div className="relative flex items-center justify-center">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full sm:rounded-xl bg-gradient-to-br from-cyan-500/30 to-blue-600/30 flex items-center justify-center border border-white/20 group-hover:border-cyan-400/50 transition-colors shadow-[inset_0_0_15px_rgba(6,182,212,0.3)]">
-            <Bot className="w-6 h-6 sm:w-7 sm:h-7 text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] group-hover:scale-110 transition-transform" />
+          <div className="w-12 h-12 rounded-full sm:rounded-xl bg-gradient-to-br from-cyan-500/30 to-blue-600/30 flex items-center justify-center border border-white/20 group-hover:border-cyan-400/50 transition-colors shadow-[inset_0_0_15px_rgba(6,182,212,0.3)]">
+            <Bot className="w-7 h-7 text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] group-hover:scale-110 transition-transform" />
           </div>
           <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-emerald-400 rounded-full border-2 border-[#0a192f] shadow-[0_0_15px_#34d399]" />
         </div>
-        <span className="sm:hidden text-[11px] font-bold text-cyan-300 uppercase tracking-widest whitespace-nowrap ml-1">
-          Hỏi AI
-        </span>
       </motion.button>
 
       {/* Chat Window */}
