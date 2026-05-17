@@ -21,7 +21,9 @@ const Hero = () => {
     let cvHref = profile?.cvUrl 
         ? (profile.cvUrl.startsWith('http') 
             ? profile.cvUrl 
-            : `${apiUrl}${profile.cvUrl.startsWith('/') ? '' : '/'}${profile.cvUrl}`)
+            : (profile.cvUrl === '/cv.pdf' 
+                ? '/cv.pdf' 
+                : `${apiUrl}${profile.cvUrl.startsWith('/') ? '' : '/'}${profile.cvUrl}`))
         : '/cv.pdf';
 
     // Force Cloudinary to download instead of opening in a new tab
