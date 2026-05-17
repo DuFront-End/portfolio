@@ -33,7 +33,16 @@ const Hero = () => {
         
         e.preventDefault();
         try {
-            const response = await fetch(cvHref);
+            // Thêm fl_attachment vào URL Cloudinary để lấy file PDF GỐC (không phải ảnh chụp trang)
+            let fetchUrl = cvHref;
+            if (fetchUrl.includes('res.cloudinary.com') && fetchUrl.includes('/upload/')) {
+                const parts = fetchUrl.split('/upload/');
+                if (parts.length === 2) {
+                    fetchUrl = `${parts[0]}/upload/fl_attachment/${parts[1]}`;
+                }
+            }
+            
+            const response = await fetch(fetchUrl);
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
