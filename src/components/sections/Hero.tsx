@@ -18,11 +18,19 @@ const Hero = () => {
     const { profile } = useProfile()
 
     const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
-    const cvHref = profile?.cvUrl 
+    let cvHref = profile?.cvUrl 
         ? (profile.cvUrl.startsWith('http') 
             ? profile.cvUrl 
             : `${apiUrl}${profile.cvUrl.startsWith('/') ? '' : '/'}${profile.cvUrl}`)
         : '/cv.pdf';
+
+    // Force Cloudinary to download instead of opening in a new tab
+    if (cvHref.includes('res.cloudinary.com') && !cvHref.includes('fl_attachment')) {
+        const parts = cvHref.split('/upload/');
+        if (parts.length === 2) {
+            cvHref = `${parts[0]}/upload/fl_attachment/${parts[1]}`;
+        }
+    }
 
     return (
         <section
@@ -237,7 +245,7 @@ const Hero = () => {
                         <motion.a
                             href={cvHref}
                             download={cvHref === '/cv.pdf' ? "Nguyen-Khanh-Du-CV.pdf" : undefined}
-                            target={cvHref.startsWith('http') ? "_blank" : undefined}
+                            target={cvHref.startsWith('http') && !cvHref.includes('fl_attachment') ? "_blank" : undefined}
                             whileHover={{
                                 scale: 1.05,
                                 boxShadow:
