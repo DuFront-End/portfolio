@@ -111,7 +111,10 @@ const MusicWaveEffect = ({ isPlaying, scrollY, activeSection }: MusicWaveEffectP
             // 2. Update particles & Draw
             const particles = particlesRef.current;
             const speedMultiplier = playing ? (1.5 + bass * 5) : 1.1; 
-            const connectionDist = playing ? (110 + intensity * 120) : 80;
+            const isMobile = canvas.width < 768;
+            const connectionDist = playing 
+                ? (isMobile ? 60 + intensity * 60 : 110 + intensity * 120) 
+                : (isMobile ? 40 : 80);
             const connectionDistSq = connectionDist * connectionDist;
 
             particlesRef.current = particles.filter(p => {
@@ -158,7 +161,10 @@ const MusicWaveEffect = ({ isPlaying, scrollY, activeSection }: MusicWaveEffectP
             // 3. Ultra Aggressive Multi-Wave effect
             if (playing) {
                 const time = Date.now() / 1000
-                const baseAmplitude = 40 + intensity * 350; // Increased massively
+                const isMobile = canvas.width < 768;
+                const baseAmplitude = isMobile 
+                    ? (15 + intensity * 100) 
+                    : (40 + intensity * 350); 
                 
                 const waveColors = currentColors.map(c => `rgba(${c}, ${0.4 + intensity})`);
                 
@@ -200,26 +206,13 @@ const MusicWaveEffect = ({ isPlaying, scrollY, activeSection }: MusicWaveEffectP
         }
     }, [])
 
-    // Calculate dynamic scale for the whole effect
-    const analyser = (window as any).audioAnalyser;
-    let bassValue = 0;
-    if (isPlaying && analyser) {
-        const dataArray = new Uint8Array(5); // Just first few bins
-        analyser.getByteFrequencyData(dataArray);
-        let sum = 0;
-        for(let i=0; i<5; i++) sum += dataArray[i];
-        bassValue = Math.pow(sum / 5 / 255, 2); // Squared for sharp reaction
-    }
-
     return (
         <canvas
             ref={canvasRef}
             className="fixed inset-0 pointer-events-none z-0"
             style={{
                 opacity: isPlaying ? 0.9 : 0.55,
-                transform: isPlaying ? `scale(${1 + bassValue * 0.08})` : 'scale(1)',
-                transition: 'opacity 0.5s ease, transform 0.05s ease-out', // Very fast transform
-                filter: isPlaying ? `contrast(${100 + bassValue * 50}%) brightness(${100 + bassValue * 30}%)` : 'none'
+                transition: 'opacity 0.5s ease'
             }}
         />
     )
