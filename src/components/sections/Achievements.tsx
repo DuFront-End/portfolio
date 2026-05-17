@@ -280,7 +280,7 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                                 src={curImg} 
                                                 alt={activeAchievement.title}
                                                 className={clsx(
-                                                    "w-full h-full object-contain drop-shadow-2xl select-none touch-none",
+                                                    "max-w-full max-h-[45dvh] md:max-h-[65vh] w-auto h-auto object-contain p-4 md:p-8 drop-shadow-2xl select-none touch-none",
                                                     album.length > 1 ? "cursor-grab active:cursor-grabbing" : ""
                                                 )}
                                                 initial={{ opacity: 0, scale: 0.95 }}
