@@ -21,6 +21,8 @@ interface AchievementAPI {
     images?: string[]
     imageDescriptions?: string[]
     articleUrl?: string
+    articleDescription?: string
+    articles?: { url: string; description: string }[]
     color: string
     bgColor: string
     borderColor: string
@@ -139,7 +141,7 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                             )}
                                             onMouseEnter={() => { 
                                                 if (window.innerWidth >= 768) {
-                                                    const hasContent = achievement.image || (achievement.images && achievement.images.length > 0) || achievement.articleUrl;
+                                                    const hasContent = achievement.image || (achievement.images && achievement.images.length > 0) || achievement.articleUrl || (achievement.articles && achievement.articles.length > 0);
                                                     if (hasContent) {
                                                         triggerFireworks();
                                                         setActiveAchievement(achievement);
@@ -148,7 +150,7 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                                 }
                                             }}
                                             onClick={() => { 
-                                                const hasContent = achievement.image || (achievement.images && achievement.images.length > 0) || achievement.articleUrl;
+                                                const hasContent = achievement.image || (achievement.images && achievement.images.length > 0) || achievement.articleUrl || (achievement.articles && achievement.articles.length > 0);
                                                 if (hasContent) {
                                                     triggerFireworks();
                                                     setActiveAchievement(achievement);
@@ -169,7 +171,7 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                             <p className="text-sm md:text-base text-music-cream/70 leading-relaxed">
                                                 <AutoTranslate text={achievement.description} />
                                             </p>
-                                            {(achievement.image || (achievement.images && achievement.images.length > 0) || achievement.articleUrl) && (
+                                            {(achievement.image || (achievement.images && achievement.images.length > 0) || achievement.articleUrl || (achievement.articles && achievement.articles.length > 0)) && (
                                                 <div className="mt-4 flex flex-wrap items-center gap-2 text-[10px] md:text-xs font-tech text-music-gold/70 uppercase tracking-widest group-hover:text-music-gold transition-all duration-300">
                                                     <FaMousePointer className="hidden md:block animate-pulse shrink-0" />
                                                     <FaHandPointer className="md:hidden block animate-bounce shrink-0" />
@@ -201,7 +203,7 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                     <div 
                                         className="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 z-10 flex items-center justify-center cursor-pointer"
                                         onClick={() => { 
-                                            const hasContent = achievement.image || (achievement.images && achievement.images.length > 0) || achievement.articleUrl;
+                                            const hasContent = achievement.image || (achievement.images && achievement.images.length > 0) || achievement.articleUrl || (achievement.articles && achievement.articles.length > 0);
                                             if (hasContent) {
                                                 triggerFireworks();
                                                 setActiveAchievement(achievement);
@@ -363,58 +365,72 @@ const Achievements = ({ activeSection }: { activeSection?: string }) => {
                                     </p>
                                 </div>
 
-                                {activeAchievement.articleUrl && (
-                                    <motion.a
-                                        href={activeAchievement.articleUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        className="mt-6 flex flex-col w-full rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden group/link cursor-pointer transition-all hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] block"
-                                    >
-                                        <div className="w-full h-32 md:h-40 relative bg-black flex items-center justify-center overflow-hidden select-none border-b border-slate-800">
-                                            {activeAchievement.image ? (
-                                                <img 
-                                                    src={activeAchievement.image} 
-                                                    alt="Link Preview"
-                                                    className="w-full h-full object-cover opacity-80 group-hover/link:opacity-100 group-hover/link:scale-105 transition-all duration-500"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-slate-700 bg-slate-950">
-                                                    <FaExternalLinkAlt className="w-8 h-8 opacity-50" />
-                                                </div>
-                                            )}
+                                {(() => {
+                                    const allArticles = [
+                                        ...(activeAchievement.articleUrl ? [{ url: activeAchievement.articleUrl, description: activeAchievement.articleDescription || '' }] : []),
+                                        ...(activeAchievement.articles || [])
+                                    ];
 
-                                            <div className="absolute bottom-3 left-3 w-8 h-8 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center p-1 shadow-lg z-10">
-                                                <img 
-                                                    src={`https://www.google.com/s2/favicons?sz=64&domain=${(() => {
-                                                        try { return new URL(activeAchievement.articleUrl || '').hostname; }
-                                                        catch { return 'google.com'; }
-                                                    })()}`} 
-                                                    alt="web-brand"
-                                                    className="w-full h-full rounded-full bg-white object-contain"
-                                                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                                />
-                                            </div>
-                                        </div>
+                                    if (allArticles.length === 0) return null;
 
-                                        <div className="p-4 flex flex-col justify-center text-left bg-slate-900">
-                                            <div className="text-sm md:text-base font-bold text-slate-200 group-hover/link:text-cyan-400 transition-colors line-clamp-2 leading-snug mb-1">
-                                                <AutoTranslate text="Đọc bài viết báo chí / Tài liệu chi tiết" />
-                                            </div>
-                                            <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-slate-500 truncate">
-                                                <FaExternalLinkAlt className="w-2.5 h-2.5" />
-                                                <span>{(() => {
-                                                    try {
-                                                        return new URL(activeAchievement.articleUrl || '').hostname.replace('www.', '');
-                                                    } catch {
-                                                        return 'Liên kết bên ngoài';
-                                                    }
-                                                })()}</span>
-                                            </div>
+                                    return (
+                                        <div className="mt-6 flex flex-col gap-4">
+                                            {allArticles.map((art, idx) => (
+                                                <motion.a
+                                                    key={idx}
+                                                    href={art.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    whileHover={{ scale: 1.02 }}
+                                                    whileTap={{ scale: 0.98 }}
+                                                    className="flex flex-col w-full rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden group/link cursor-pointer transition-all hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] shrink-0"
+                                                >
+                                                    <div className="w-full h-24 md:h-28 relative bg-black flex items-center justify-center overflow-hidden select-none border-b border-slate-800">
+                                                        {activeAchievement.image ? (
+                                                            <img 
+                                                                src={activeAchievement.image} 
+                                                                alt="Link Preview"
+                                                                className="w-full h-full object-cover opacity-80 group-hover/link:opacity-100 group-hover/link:scale-105 transition-all duration-500"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-slate-700 bg-slate-950">
+                                                                <FaExternalLinkAlt className="w-6 h-6 opacity-50" />
+                                                            </div>
+                                                        )}
+
+                                                        <div className="absolute bottom-2 left-2 w-7 h-7 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center p-1 shadow-lg z-10">
+                                                            <img 
+                                                                src={`https://www.google.com/s2/favicons?sz=64&domain=${(() => {
+                                                                    try { return new URL(art.url || '').hostname; }
+                                                                    catch { return 'google.com'; }
+                                                                })()}`} 
+                                                                alt="web-brand"
+                                                                className="w-full h-full rounded-full bg-white object-contain"
+                                                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-3.5 flex flex-col justify-center text-left bg-slate-900">
+                                                        <div className="text-[13px] md:text-sm font-bold text-slate-200 group-hover/link:text-cyan-400 transition-colors line-clamp-2 leading-snug mb-1">
+                                                            <AutoTranslate text={art.description || "Đọc bài viết báo chí / Tài liệu chi tiết"} />
+                                                        </div>
+                                                        <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] text-slate-500 truncate">
+                                                            <FaExternalLinkAlt className="w-2 h-2" />
+                                                            <span>{(() => {
+                                                                try {
+                                                                    return new URL(art.url || '').hostname.replace('www.', '');
+                                                                } catch {
+                                                                    return 'Liên kết bên ngoài';
+                                                                }
+                                                            })()}</span>
+                                                        </div>
+                                                    </div>
+                                                </motion.a>
+                                            ))}
                                         </div>
-                                    </motion.a>
-                                )}
+                                    );
+                                })()}
                             </div>
                         </motion.div>
                     </motion.div>
