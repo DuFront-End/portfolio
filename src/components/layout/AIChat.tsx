@@ -109,7 +109,11 @@ const AIChat: React.FC = () => {
       {/* Floating Tooltip Label (Desktop only) */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
+        animate={{ 
+          y: (isVisible && !isOpen && !isMusicDrawerOpen) ? 0 : 50,
+          opacity: (isVisible && !isOpen && !isMusicDrawerOpen) ? 1 : 0 
+        }}
+        transition={{ duration: 0.3 }}
         className="hidden lg:block fixed bottom-[115px] left-8 z-50 pointer-events-none"
       >
         <div className="bg-[#05080f]/90 backdrop-blur-md border border-music-gold/30 px-3 py-1.5 rounded-xl shadow-xl flex items-center gap-2">
